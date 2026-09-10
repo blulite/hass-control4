@@ -455,7 +455,7 @@ class Control4Entity(Entity):
                 else:
                     self._extra_state_attributes[key.upper()] = value
 
-    @cached_property
+    @property
     def device_info(self) -> DeviceInfo:
         """Return info of parent Control4 device of entity."""
         return DeviceInfo(
@@ -463,7 +463,13 @@ class Control4Entity(Entity):
             manufacturer=self._device_manufacturer,
             model=self._device_model,
             name=self._device_name,
-            via_device=(DOMAIN, self._controller_unique_id),
+            # The controller device is created in async_setup_entry before any
+            # entity is added, so this lookup always resolves.
+            via_device_id=dr.async_get_device_id_by_identifier(
+                self.hass,
+                (DOMAIN, self._controller_unique_id),
+                config_entry_id=self.entry.entry_id,
+            ),
             suggested_area=self._device_area,
         )
 
@@ -505,7 +511,7 @@ class Control4CoordinatorEntity(CoordinatorEntity[Any]):
         self._extra_state_attributes["item id"] = idx
         self._extra_state_attributes["parent item id"] = device_id
 
-    @cached_property
+    @property
     def device_info(self) -> DeviceInfo:
         """Return info of parent Control4 device of entity."""
         return DeviceInfo(
@@ -513,7 +519,13 @@ class Control4CoordinatorEntity(CoordinatorEntity[Any]):
             manufacturer=self._device_manufacturer,
             model=self._device_model,
             name=self._device_name,
-            via_device=(DOMAIN, self._controller_unique_id),
+            # The controller device is created in async_setup_entry before any
+            # entity is added, so this lookup always resolves.
+            via_device_id=dr.async_get_device_id_by_identifier(
+                self.hass,
+                (DOMAIN, self._controller_unique_id),
+                config_entry_id=self.coordinator.config_entry.entry_id,
+            ),
             suggested_area=self._device_area,
         )
 
