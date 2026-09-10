@@ -112,6 +112,7 @@ async def async_setup_entry(
     coordinator = DataUpdateCoordinator[dict[int, dict[str, Any]]](
         hass,
         _LOGGER,
+        config_entry=entry,
         name="room",
         update_method=async_update_data,
         update_interval=timedelta(seconds=scan_interval),
